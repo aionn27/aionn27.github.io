@@ -221,3 +221,106 @@ nav a.nav-active {
   .main  { grid-column: 1; grid-row: 2; }
   .side-image { grid-column: 1; grid-row: 3; }
 }
+/* Dachshund */
+.dog {
+  grid-column: 3;
+  grid-row: 1;
+  align-self: end;
+  width: 100%;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.dog svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.dog-line {
+  display: block;
+  min-height: 1.6em;
+  margin-top: 4px;
+  font-size: 18px;
+  font-style: italic;
+  text-align: right;
+}
+
+/* Which pose shows */
+.dog .awake-pose { display: none; }
+.dog.awake .awake-pose { display: inline; }
+.dog.awake .sleep-pose { display: none; }
+
+/* Sleeping: breathing and floating z's */
+.sleep-body {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: breathe 3.2s ease-in-out infinite;
+}
+
+.zzz text {
+  opacity: 0;
+  animation: float-z 2.6s ease-in-out infinite;
+}
+.zzz text:nth-child(2) { animation-delay: 0.7s; }
+.zzz text:nth-child(3) { animation-delay: 1.4s; }
+
+@keyframes breathe {
+  0%, 100% { transform: scaleY(1); }
+  50%      { transform: scaleY(1.06); }
+}
+
+@keyframes float-z {
+  0%   { opacity: 0; transform: translate(0, 6px); }
+  40%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(5px, -8px); }
+}
+
+/* Awake: tail wag and hop */
+.tail { transform-origin: 196px 68px; }
+
+.dog.awake:hover .tail,
+.dog.awake:focus-visible .tail,
+.dog.happy .tail {
+  animation: wag 0.28s ease-in-out infinite alternate;
+}
+
+.dog.happy svg { animation: hop 0.4s ease; }
+
+@keyframes wag {
+  from { transform: rotate(-14deg); }
+  to   { transform: rotate(14deg); }
+}
+
+@keyframes hop {
+  0%, 100% { transform: translateY(0); }
+  40%      { transform: translateY(-6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dog svg, .dog .tail, .sleep-body, .zzz text { animation: none !important; }
+  .zzz text { opacity: 1; }
+}
+
+/* Medium screens: the dog sits under the picture and text */
+@media (max-width: 1100px) {
+  .dog {
+    grid-column: 2;
+    grid-row: 3;
+    align-self: start;
+    max-width: 240px;
+    margin-top: 24px;
+  }
+}
+
+/* Phones */
+@media (max-width: 800px) {
+  .dog {
+    grid-column: 1;
+    grid-row: 4;
+  }
+}
