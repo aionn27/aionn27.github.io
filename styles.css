@@ -1,0 +1,93 @@
+body {
+  margin: 0;
+  font-family: "EB Garamond", Georgia, serif;
+  font-size: 20px;
+  line-height: 1.7;
+  color: #1a1a1a;
+  background: #ffffff;
+  max-width: 640px;
+  margin: 70px auto;
+  padding: 0 20px;
+}
+
+header h2 {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.8rem;
+  margin: 0 0 4px 0;
+}
+
+header h2 a {
+  color: #1a1a1a;
+  border-bottom: none;
+}
+
+nav {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 6px;
+  margin-bottom: 28px;
+}
+
+nav a {
+  font-variant: small-caps;
+  letter-spacing: 0.05em;
+  margin-right: 18px;
+  color: #4a5a7a;
+  border-bottom: none;
+}
+
+nav a.nav-active {
+  color: #8a4b12;
+  border-bottom: 2px solid #8a4b12;
+}
+
+a {
+  color: #8a4b12;
+  text-decoration: none;
+  border-bottom: 1px solid #e3d3c2;
+}
+
+a:hover {
+  border-bottom-color: #8a4b12;
+}
+
+.portrait {
+  float: right;
+  width: 140px;
+  margin: 0 0 12px 24px;
+  image-rendering: pixelated;
+}
+
+main::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+.links {
+  border-top: 1px solid #ddd;
+  margin-top: 50px;
+  padding-top: 16px;
+  font-size: 17px;
+}
+
+.links a {
+  margin-right: 22px;
+}
+
+footer {
+  border-top: 1px solid #ddd;
+  margin-top: 40px;
+  padding-top: 16px;
+  font-size: 15px;
+  color: #777;
+}
+
+ul {
+  padding-left: 20px;
+}
+
+@media (max-width: 600px) {
+  body { font-size: 18px; margin: 40px auto; }
+  .portrait { width: 100px; }
+}
