@@ -324,3 +324,55 @@ nav a.nav-active {
     grid-row: 4;
   }
 }
+.site-footer {
+  font-size: 14px;
+  color: #777777;
+  margin-top: 12px;
+}
+/* Lilies */
+.lilies {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.lily {
+  position: absolute;
+  display: block;
+  will-change: transform;
+}
+
+.lily svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transform: scale(0.2);
+  animation: bloom 1.4s ease-out forwards;
+  animation-delay: var(--d);
+}
+
+@keyframes bloom {
+  to {
+    opacity: var(--o);
+    transform: scale(1);
+  }
+}
+
+/* Keep your content above the flowers */
+.page {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lily svg {
+    animation: none;
+    opacity: var(--o);
+    transform: none;
+  }
+}

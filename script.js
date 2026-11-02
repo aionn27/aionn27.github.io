@@ -124,7 +124,7 @@ document.querySelectorAll('.chain').forEach(function (chain) {
     awake = true;
     dog.classList.add('awake');
     dog.setAttribute('aria-label', 'The dachshund. Press to stretch her.');
-    line.textContent = 'she woke up. pet her.';
+    line.textContent = 'she woke up! u can pet her';
     hop();
   }
 
@@ -167,4 +167,188 @@ document.querySelectorAll('.chain').forEach(function (chain) {
   } else {
     wake();
   }
+})();
+// 4) Pink lilies bloom across the background, then drift in the wind and get swept by the mouse
+(function () {
+  var picture = document.getElementById('reflection-image');
+  if (!picture) return;
+
+  // Settings you can change
+  var WIND = 1;          // 0 = no wind, 2 = stronger wind
+  var MOUSE_POWER = 1;   // 0 = the mouse does nothing, 2 = a stronger sweep
+  var AVOID_TEXT = true; // where the lilies start: true = away from the text, false = anywhere
+  var RADIUS = 130;      // how close the mouse has to be to move a lily (pixels)
+
+  // One lily drawn as SVG. It is built once and reused for every flower.
+  function petal(angle, fill) {
+    return '<path transform="rotate(' + angle + ')" d="M0 0 C9 -12 11 -32 0 -46 C-11 -32 -9 -12 0 0Z" fill="' + fill + '" stroke="#e48fb3" stroke-width="1.4" stroke-linejoin="round"/>';
+  }
+  var parts = '';
+  [30, 150, 270].forEach(function (a) { parts += petal(a, '#f7b7cf'); });
+  [0, 120, 240].forEach(function (a) { parts += petal(a, '#fbd2e1'); });
+  [0, 120, 240].forEach(function (a) {
+    parts += '<path transform="rotate(' + a + ')" d="M0 -6 L0 -30" stroke="#e07aa4" stroke-width="1.2" stroke-linecap="round" fill="none"/>';
+  });
+  [20, 80, 140, 200, 260, 320].forEach(function (a) {
+    parts += '<g transform="rotate(' + a + ')"><path d="M0 0 L0 -16" stroke="#c0446f" stroke-width="1" fill="none"/><circle cy="-17" r="2.2" fill="#9c2f58"/></g>';
+  });
+  var LILY = '<svg viewBox="-50 -50 100 100">' + parts + '</svg>';
+
+  var lilies = [];
+  var mouse = { x: -9999, y: -9999, vx: 0, vy: 0 };
+  var bloomed = false;
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Track the pointer (mouse, pen, or finger) in page coordinates
+  window.addEventListener('pointermove', function (event) {
+    if (mouse.x > -9000) {
+      mouse.vx = mouse.vx * 0.5 + (event.pageX - mouse.x) * 0.5;
+      mouse.vy = mouse.vy * 0.5 + (event.pageY - mouse.y) * 0.5;
+    }
+    mouse.x = event.pageX;
+    mouse.y = event.pageY;
+  });
+  document.documentElement.addEventListener('mouseleave', function () {
+    mouse.x = -9999;
+    mouse.y = -9999;
+  });
+
+  function place(layer) {
+    var w = document.documentElement.clientWidth;
+    var h = layer.offsetHeight;
+
+    var avoid = [];
+    if (AVOID_TEXT) {
+      ['.side', '.main', '.side-image', '.dog'].forEach(function (selector) {
+        var el = document.querySelector(selector);
+        if (!el) return;
+        var r = el.getBoundingClientRect();
+        avoid.push({
+          l: r.left + window.pageXOffset - 24,
+          t: r.top + window.pageYOffset - 24,
+          r: r.right + window.pageXOffset + 24,
+          b: r.bottom + window.pageYOffset + 24
+        });
+      });
+    }
+
+    function blocked(x, y, s) {
+      return avoid.some(function (a) {
+        return x + s > a.l && x < a.r && y + s > a.t && y < a.b;
+      });
+    }
+
+    var count = Math.max(14, Math.min(55, Math.round(w * h / 30000)));
+
+    for (var i = 0; i < count; i++) {
+      var size = 26 + Math.random() * 34;
+      var x = 0, y = 0, ok = false;
+      for (var tries = 0; tries < 30 && !ok; tries++) {
+        x = Math.random() * (w - size);
+        y = Math.random() * (h - size);
+        ok = !blocked(x, y, size);
+      }
+      if (!ok) continue;
+
+      var el = document.createElement('span');
+      el.className = 'lily';
+      el.innerHTML = LILY;
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      el.style.width = size + 'px';
+      el.style.height = size + 'px';
+      el.style.setProperty('--o', (0.55 + Math.random() * 0.35).toFixed(2));
+      el.style.setProperty('--d', (Math.random() * 2.4).toFixed(2) + 's');
+      layer.appendChild(el);
+
+      var rot = Math.random() * 360;
+      el.style.transform = 'rotate(' + rot.toFixed(1) + 'deg)';
+
+      lilies.push({
+        el: el, size: size,
+        hx: x, hy: y,            // home: where the flower started
+        x: x, y: y,              // where it is now
+        vx: 0, vy: 0,
+        rot: rot, vr: 0,
+        spin: (Math.random() - 0.5) * 0.3,
+        phase: Math.random() * 6.28,
+        lift: 0.6 + 0.8 * Math.max(0, Math.min(1, (60 - size) / 34)) // small flowers are lighter
+      });
+    }
+  }
+
+  var last = 0;
+
+  function tick(now) {
+    var dt = Math.min((now - last) / 16.67, 3) || 1;
+    last = now;
+    var t = now / 1000;
+
+    // A breeze that is always blowing a little, with bigger gusts now and then
+    var gust = Math.max(0, Math.sin(t * 0.35) * Math.sin(t * 0.13 + 1));
+    var windX = (0.012 + 0.07 * gust) * WIND;
+    var windY = Math.sin(t * 0.5) * 0.01 * WIND;
+
+    mouse.vx *= Math.pow(0.9, dt);
+    mouse.vy *= Math.pow(0.9, dt);
+    var energy = Math.min(Math.sqrt(mouse.vx * mouse.vx + mouse.vy * mouse.vy) / 12, 1);
+    var damping = Math.pow(0.97, dt);
+
+    for (var i = 0; i < lilies.length; i++) {
+      var L = lilies[i];
+
+      var ax = windX * L.lift + Math.sin(t * 0.9 + L.phase) * 0.006 * WIND;
+      var ay = windY * L.lift + Math.cos(t * 0.7 + L.phase) * 0.006 * WIND;
+
+      // A gentle pull back toward where the flower started
+      ax += (L.hx - L.x) * 0.0004;
+      ay += (L.hy - L.y) * 0.0004;
+
+      // The mouse pushes flowers away and carries them along
+      var dx = L.x + L.size / 2 - mouse.x;
+      var dy = L.y + L.size / 2 - mouse.y;
+      var d = Math.sqrt(dx * dx + dy * dy) || 1;
+      if (d < RADIUS) {
+        var f = 1 - d / RADIUS;
+        var push = f * f * 0.9 * (0.25 + 0.75 * energy) * MOUSE_POWER;
+        ax += dx / d * push + mouse.vx * f * 0.012 * MOUSE_POWER;
+        ay += dy / d * push + mouse.vy * f * 0.012 * MOUSE_POWER;
+      }
+
+      L.vx = (L.vx + ax * dt) * damping;
+      L.vy = (L.vy + ay * dt) * damping;
+      var speed = Math.sqrt(L.vx * L.vx + L.vy * L.vy);
+      if (speed > 12) { L.vx *= 12 / speed; L.vy *= 12 / speed; }
+      L.x += L.vx * dt;
+      L.y += L.vy * dt;
+
+      // Flowers turn a little as they travel
+      L.vr += (L.vx * 0.6 + L.spin - L.vr) * 0.05 * dt;
+      L.rot += L.vr * dt;
+
+      L.el.style.transform =
+        'translate3d(' + (L.x - L.hx).toFixed(1) + 'px,' + (L.y - L.hy).toFixed(1) + 'px,0) rotate(' + L.rot.toFixed(1) + 'deg)';
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  function bloom() {
+    if (bloomed) return;
+    bloomed = true;
+
+    var layer = document.createElement('div');
+    layer.className = 'lilies';
+    layer.setAttribute('aria-hidden', 'true');
+    layer.style.height = Math.max(document.documentElement.scrollHeight, window.innerHeight) + 'px';
+    document.body.appendChild(layer);
+
+    place(layer);
+    if (!reduceMotion) requestAnimationFrame(tick);
+  }
+
+  // They bloom at the same moment the reflection's picture appears
+  new MutationObserver(function () {
+    if (picture.classList.contains('show')) bloom();
+  }).observe(picture, { attributes: true, attributeFilter: ['class'] });
 })();
