@@ -217,8 +217,13 @@ document.querySelectorAll('.chain').forEach(function (chain) {
     var w = document.documentElement.clientWidth;
     var h = layer.offsetHeight;
 
+    // On phones and small screens everything is stacked and there is no empty space,
+    // so the lilies float softly behind the text instead of avoiding it.
+    var avoidText = AVOID_TEXT && w >= 1200;
+    var small = w < 700;
+
     var avoid = [];
-    if (AVOID_TEXT) {
+    if (avoidText) {
       ['.side', '.main', '.side-image', '.dog'].forEach(function (selector) {
         var el = document.querySelector(selector);
         if (!el) return;
@@ -241,7 +246,7 @@ document.querySelectorAll('.chain').forEach(function (chain) {
     var count = Math.max(14, Math.min(55, Math.round(w * h / 30000)));
 
     for (var i = 0; i < count; i++) {
-      var size = 26 + Math.random() * 34;
+      var size = small ? 20 + Math.random() * 26 : 26 + Math.random() * 34;
       var x = 0, y = 0, ok = false;
       for (var tries = 0; tries < 30 && !ok; tries++) {
         x = Math.random() * (w - size);
@@ -257,7 +262,8 @@ document.querySelectorAll('.chain').forEach(function (chain) {
       el.style.top = y + 'px';
       el.style.width = size + 'px';
       el.style.height = size + 'px';
-      el.style.setProperty('--o', (0.55 + Math.random() * 0.35).toFixed(2));
+      // Paler when the flowers can sit behind text, so the writing stays easy to read
+      el.style.setProperty('--o', (avoidText ? 0.55 + Math.random() * 0.35 : 0.3 + Math.random() * 0.3).toFixed(2));
       el.style.setProperty('--d', (Math.random() * 2.4).toFixed(2) + 's');
       layer.appendChild(el);
 
