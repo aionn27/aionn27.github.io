@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arche | ralf aion j.</title>
+  <meta name="description" content="An interactive timeline of Western philosophy in four eras: ancient, medieval, modern, and contemporary. Choose an era to meet its philosophers and read about their major works.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+</head>
+<body>
+  <header class="top">
+    <a class="back" href="../index.html">&larr; ralf aion j.</a>
+    <a>/</a>
+    <a href="mailto:educralfj@gmail.com">suggest some changes</a>
+  </header>
+  
+
+  <main class="wrap">
+    <section class="hero">
+    <div class="hero-text">
+    <p class="eyebrow">ARCHE: A Timeline of Philosophy for Beginners </p>
+    <h1>Philosophy, by its <em>major</em> periods: </h1>
+    <p class="lede">Philosophy is usually divided into four major periods. Each period has a distinct focus depending on what is going on with culture and society at that time, or what ideas are most enticing to engage in or respond to. I personally find the Modern Period to be the most enjoyable to learn about, because a lot of figures, ideas, and works engage in or overlap with modern science. Rest assured no matter what period you learn about, one thing is certain: <em>They're all nerds. </em></p>
+    </div>
+    <canvas id="phi" class="phi" aria-hidden="true"></canvas>
+    </section>
+    <div class="bar" id="bar"></div>
+
+    <div class="stage" id="stage" aria-live="polite">
+      <p class="hint">Above are the periods and selected Philosophers in each period. Next time I'll add a writing Descartes sitting by a fire somewhere here lol. </p>
+      <p class="hint">-----------------------------------------------------------AS OF MID-NOVEMBER, THIS IS STILL A WORK IN PROGRESS HAHA... i'll get back to this-----------------------------------------------------------</p>
+    </div>
+
+    <div class="detail" id="detail" aria-live="polite"></div>
+
+    <noscript><p>This timeline needs JavaScript to run. Please turn it on in your browser.</p></noscript>
+    
+
+    <p class="foot">
+      "Reading furnishes the mind only with materials of knowledge; it is thinking that makes what we read ours." - John Locke
+    </p>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script src="phi.js"></script>
+</body>
+</html>

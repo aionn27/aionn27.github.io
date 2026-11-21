@@ -1,0 +1,318 @@
+/* =========================================================
+   DESIGN SETTINGS: change the look of the whole page here.
+   Everything below this block reads from these values.
+   ========================================================= */
+:root {
+  /* Fonts (see the guide for how to use other fonts) */
+  --font-body: Georgia, "Times New Roman", serif;
+  --font-heading: Georgia, "Times New Roman", serif;
+
+  /* Font sizes */
+  --size-body: 18px;                           /* normal text */
+  --size-title: clamp(2.6rem, 7vw, 5.2rem);    /* the big title */
+  --size-era: 1.1rem;                          /* ANCIENT, MEDIEVAL, ... */
+  --size-era-mobile: 0.72rem;                  /* the same, on phones */
+  --size-dates: 0.85rem;                       /* dates under each era */
+  --size-pin: 1.05rem;                         /* philosopher names on the line */
+  --size-years: 0.8rem;                        /* years under each name */
+  --size-detail-title: 2.8rem;                 /* a philosopher's name in the panel */
+  --size-small: 0.88rem;                       /* years, notes, footer */
+
+  /* Colors (each era's own color is set in data.js) */
+  --color-bg: #ffffff;
+  --color-text: #1a1a1a;
+  --color-soft: #777676;                       /* secondary text */
+  --color-muted: #666666;                      /* dates, labels */
+  --color-accent: #168a16;                     /* links and highlights */
+  --color-rule: #dcdcdc;                       /* thin divider lines */
+
+  /* Layout and motion */
+  --pad-x: clamp(20px, 5vw, 80px);             /* space at the left and right edges */
+  --line-height-hover: 22px;                   /* how thick the line gets on hover */
+  --hover-speed: 0.5s;                         /* how fast the hover reacts */
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--size-body);
+  line-height: 1.55;
+}
+
+a { color: var(--color-accent); }
+
+button { font: inherit; color: inherit; }
+button:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+
+/* Full width: the page now stretches across the screen */
+.top, .wrap {
+  width: 100%;
+  padding-left: var(--pad-x);
+  padding-right: var(--pad-x);
+}
+
+.top { padding-top: 24px; font-size: 16px; }
+.back { text-decoration: none; border-bottom: 1px solid var(--color-rule); }
+
+.wrap { padding-top: 32px; padding-bottom: 100px; }
+
+.eyebrow {
+  margin: 0 0 10px;
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+h1 {
+  margin: 0 0 16px;
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: var(--size-title);
+  line-height: 1.05;
+}
+h1 em { color: var(--color-accent); }
+
+.lede { max-width: 78rem; margin: 0 0 56px; color: var(--color-soft); }
+
+/* The line, split into four eras */
+.bar { display: flex; align-items: flex-start; }
+
+.era {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  opacity: 0.88;
+  transition: opacity 0.25s;
+}
+.era + .era { margin-left: 4px; }
+.era:hover, .era.active { opacity: 1; }
+.bar.has-active .era:not(.active) { opacity: 0.45; }
+.bar.has-active .era:not(.active):hover { opacity: 0.8; }
+
+.era .name {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: var(--size-era);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c);
+}
+.era .dates { display: block; font-size: var(--size-dates); color: var(--color-muted); }
+
+.era .line {
+  position: relative;
+  display: block;
+  height: 12px;
+  margin-top: 10px;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.5) 0 2px, transparent 2px 22px),
+    var(--c);
+  transition: height var(--hover-speed) ease, box-shadow var(--hover-speed) ease;
+}
+.era.active .line { height: 18px; }
+
+/* A beam of light that can sweep along the line (used on hover below) */
+.era .line::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -40%;
+  width: 40%;
+  opacity: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+}
+
+/* ---- HOVER ANIMATION: what happens when the mouse touches the line ---- */
+@media (hover: hover) {
+  .era:hover .line {
+    height: var(--line-height-hover);                 /* 1. the line grows thicker */
+    box-shadow: 0 8px 18px -8px var(--c);             /* 2. it glows */
+    animation: flow 1.2s linear infinite;             /* 3. the tick marks slide along */
+  }
+  .era:hover .line::after {
+    opacity: 1;                                       /* 4. a beam of light sweeps across */
+    animation: sweep 1.1s ease-in-out infinite;
+  }
+}
+
+@keyframes flow {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 22px 0, 0 0; }
+}
+
+@keyframes sweep {
+  from { left: -40%; }
+  to   { left: 100%; }
+}
+
+/* a short stem joins the open era to its own line below */
+.era.active::after {
+  content: "";
+  display: block;
+  width: 2px;
+  height: 18px;
+  margin: 0 auto;
+  background: var(--c);
+}
+
+/* Philosophers hang below the line */
+.stage { min-height: 120px; }
+.stage.open { border-top: 4px solid var(--c); }
+
+.hint { margin: 34px 0; color: var(--color-muted); font-style: italic; }
+
+.pins {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+  align-items: start;
+}
+
+.pin {
+  padding: 0 4px 14px;
+  border: 0;
+  background: none;
+  text-align: center;
+  cursor: pointer;
+  opacity: 0;
+  animation: pop 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.25) forwards;
+  animation-delay: calc(var(--i) * 70ms);
+}
+
+.pin .stem { display: block; width: 2px; height: 20px; margin: 0 auto; background: var(--c); }
+.pin:nth-child(even) .stem { height: 44px; }
+
+.pin .dot {
+  display: block;
+  width: 11px;
+  height: 11px;
+  margin: -1px auto 6px;
+  border-radius: 50%;
+  background: var(--c);
+  transition: transform 0.2s;
+}
+
+.pin .pname { display: block; font-size: var(--size-pin); line-height: 1.2; }
+.pin .years { display: block; margin-top: 2px; font-size: var(--size-years); color: var(--color-muted); }
+
+.pin:hover .pname, .pin.active .pname { color: var(--c); }
+.pin.active .pname { text-decoration: underline; text-underline-offset: 3px; }
+.pin:hover .dot, .pin.active .dot { transform: scale(1.5); }
+
+.blurb { margin: 6px 0 0; max-width: 80rem; color: var(--color-soft); font-style: normal; }
+
+@keyframes pop {
+  from { opacity: 0; transform: translateY(-20px) scale(0.7); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* A philosopher's works: two columns on wide screens */
+.detail { margin-top: 26px; }
+.detail:empty { display: none; }
+.detail.show {
+  padding-top: 28px;
+  border-top: 1px solid var(--color-rule);
+  animation: rise 0.4s ease;
+}
+
+@media (min-width: 1000px) {
+  .detail.show {
+    display: grid;
+    grid-template-columns: minmax(260px, 1fr) minmax(0, 2fr);
+    gap: 0 clamp(32px, 6vw, 96px);
+    align-items: start;
+  }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.detail h2 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: var(--size-detail-title);
+  line-height: 1.12;
+  color: var(--c);
+}
+.detail .meta { margin: 4px 0 14px; color: var(--color-muted); font-size: var(--size-small); }
+.detail .about { max-width: 38rem; margin: 0 0 24px; }
+.detail h3 {
+  margin: 0 0 6px;
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.works { max-width: 54rem; margin: 0; padding: 0; list-style: none; }
+.works li {
+  display: grid;
+  grid-template-columns: 8.5rem 1fr;
+  gap: 0 16px;
+  padding: 12px 0;
+  border-top: 1px solid var(--color-rule);
+}
+.wyear { padding-top: 0.2rem; font-size: var(--size-small); color: var(--color-muted); }
+.wtitle { display: block; font-style: italic; }
+.wnote { display: block; font-size: 0.95rem; color: var(--color-soft); }
+
+.fine { max-width: 54rem; margin: 14px 0 0; font-size: 0.85rem; color: var(--color-muted); }
+
+.foot {
+  margin: 80px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-rule);
+  font-size: var(--size-small);
+  color: var(--color-muted);
+}
+
+/* Phones and small screens */
+@media (max-width: 700px) {
+  :root { --size-body: 17px; }
+  .era .name { font-size: var(--size-era-mobile); letter-spacing: 0; text-transform: none; }
+  .era .dates { display: none; }
+  .era + .era { margin-left: 3px; }
+  .pin:nth-child(even) .stem { height: 20px; }
+  .works li { grid-template-columns: 5.4rem 1fr; gap: 0 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pin { animation: none; opacity: 1; }
+  .detail.show { animation: none; }
+  .era, .era .line, .pin .dot { transition: none; }
+  .era:hover .line, .era:hover .line::after { animation: none; }
+}
+/* The big φ beside the title */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: clamp(24px, 4vw, 72px);
+  align-items: center;
+}
+
+.phi {
+  display: block;
+  width: clamp(180px, 22vw, 320px);
+  aspect-ratio: 5 / 6;
+  touch-action: pan-y;
+}
+
+/* Phones: the φ sits under the text */
+@media (max-width: 800px) {
+  .hero { grid-template-columns: 1fr; }
+  .phi { width: min(62vw, 260px); margin: 8px auto 28px; }
+}
